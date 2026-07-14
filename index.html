@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Para Lily 🌻</title>
+    <style>
+        /* ================= ESTILOS GERAIS ================= */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: #020004;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: manipulation;
+        }
+
+        /* ================= TELA INICIAL (CARTÃO) ================= */
+        #intro-screen {
+            position: absolute;
+            z-index: 50;
+            background: rgba(15, 0, 10, 0.7);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 100, 150, 0.4);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(255, 0, 100, 0.5), inset 0 0 20px rgba(255, 100, 150, 0.2);
+            width: 90%;
+            max-width: 350px;
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        #intro-screen h1 {
+            color: #ffd1dc;
+            margin-bottom: 15px;
+            font-size: 26px;
+            text-shadow: 0 0 15px #ff0055, 0 0 30px #ff3385;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        #intro-screen img {
+            width: 100%;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.8);
+        }
+
+        button.btn-acao {
+            background: linear-gradient(45deg, #ff0055, #ff6699);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 5px 20px rgba(255, 0, 85, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            width: 100%;
+        }
+
+        /* ================= FUNDO DA GALÁXIA & ESTRELAS ================= */
+        #galaxy-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, #260012 0%, #08000a 50%, #000000 100%);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 2.5s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite alternate;
+            opacity: 0;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.1; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 5px #fff; }
+        }
+
+        /* ================= CORAÇÃO E ÁREA CLICÁVEL ================= */
+        .core-glow {
+            position: absolute;
+            width: 40vmin;
+            height: 40vmin;
+            background: radial-gradient(circle, rgba(255,0,85,0.35) 0%, rgba(0,0,0,0) 65%);
+            animation: pulseGlow 2s infinite alternate;
+            z-index: 5;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        #heart-cluster {
+            position: absolute;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            animation: pulseCluster 1.5s infinite alternate;
+        }
+
+        /* Área invisível clicável por cima do coração central */
+        #center-click-area {
+            position: absolute;
+            width: clamp(100px, 25vmin, 150px);
+            height: clamp(100px, 25vmin, 150px);
+            border-radius: 50%;
+            z-index: 25; /* Fica acima de quase tudo */
+            cursor: pointer;
+        }
+
+        .mini-heart {
+            position: absolute;
+            color: #ff0055;
+            font-size: clamp(10px, 3vmin, 16px);
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            text-shadow: 0 0 5px #ff3385, 0 0 15px #ff0055;
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0) rotate(-20deg); }
+            70% { opacity: 1; transform: translate(-50%, -50%) scale(1.3) rotate(10deg); }
+            100% { opacity: 0.7; transform: translate(-50%, -50%) scale(0.9) rotate(0deg); }
+        }
+
+        @keyframes miniPulse {
+            0% { opacity: 0.7; transform: translate(-50%, -50%) scale(0.9); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            100% { transform: scale(1.3); opacity: 1; }
+        }
+
+        @keyframes pulseCluster {
+            0% { transform: scale(0.95); }
+            100% { transform: scale(1.05); }
+        }
+
+        /* ================= VÓRTICE E TEXTOS ================= */
+        #vortex {
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+            transform-style: preserve-3d;
+            transform: rotateX(65deg) rotateY(0deg); 
+            animation: spinVortex 40s linear infinite;
+            z-index: 15;
+            pointer-events: none; /* Para não bloquear o clique do coração */
+        }
+
+        @keyframes spinVortex {
+            0% { transform: rotateX(65deg) rotateZ(0deg); }
+            100% { transform: rotateX(65deg) rotateZ(360deg); }
+        }
+
+        .orbit-item {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-style: preserve-3d;
+        }
+
+        .orbit-content {
+            font-weight: 800;
+            font-size: clamp(12px, 3.5vmin, 18px);
+            color: #ff4d94;
+            text-shadow: 0 0 8px #ff0055, 0 0 15px #ff0055;
+            white-space: nowrap;
+            transform: rotateX(-65deg);
+            /* A animação será aplicada via JS para ter velocidades diferentes */
+        }
+
+        .orbit-image {
+            width: clamp(70px, 20vmin, 100px);
+            height: clamp(70px, 20vmin, 100px);
+            border-radius: 50%;
+            border: 3px solid #ff3385;
+            box-shadow: 0 0 20px #ff0055, inset 0 0 10px rgba(255,255,255,0.5);
+            object-fit: cover;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform: rotateX(-65deg);
+            animation: floatSpidey 3s ease-in-out infinite alternate; /* O giro agora é por JS */
+            pointer-events: auto;
+        }
+
+        .orbit-image:hover, .orbit-image:active {
+            box-shadow: 0 0 30px #fff, 0 0 50px #ff0055;
+            border-color: #fff;
+            transform: rotateX(-65deg) scale(1.1);
+        }
+
+        @keyframes floatSpidey {
+            0% { margin-top: 0px; }
+            100% { margin-top: -15px; }
+        }
+
+        @keyframes counterSpin {
+            0% { transform: rotateX(-65deg) rotateY(0deg); }
+            100% { transform: rotateX(-65deg) rotateY(-360deg); }
+        }
+
+        /* ================= MODAIS ================= */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease;
+        }
+
+        .modal-card {
+            background: rgba(20, 5, 15, 0.9);
+            border: 1px solid rgba(255, 204, 0, 0.4);
+            border-radius: 20px;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(255, 180, 0, 0.15), 0 0 20px rgba(255, 0, 100, 0.2);
+            width: 90%;
+            max-width: 500px;
+            max-height: 85vh;
+            transform: translateY(30px) scale(0.95);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-card h2 {
+            color: #ffd1dc;
+            margin-bottom: 15px;
+            font-size: clamp(20px, 6vw, 26px);
+            font-family: 'Georgia', serif;
+            text-shadow: 0 0 10px rgba(255, 200, 0, 0.4);
+        }
+
+        .text-content {
+            overflow-y: auto;
+            text-align: justify;
+            padding-right: 10px;
+            margin-bottom: 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .text-content::-webkit-scrollbar { width: 5px; }
+        .text-content::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+        .text-content::-webkit-scrollbar-thumb { background: #ff6699; border-radius: 10px; }
+
+        .modal-card p {
+            font-size: clamp(14px, 4vw, 15.5px);
+            color: #fce4ec;
+            margin-bottom: 12px;
+            line-height: 1.6;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .fechar-modal {
+            background: transparent;
+            color: #ffd1dc;
+            border: 2px solid #ff6699;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: 0.3s;
+            align-self: center;
+            text-transform: uppercase;
+        }
+        
+        .fechar-modal:hover {
+            background: #ff6699;
+            color: #fff;
+        }
+
+        /* Estilo Específico Modal do Coração Central */
+        #modal-centro-card h2 {
+            font-size: 32px;
+            color: #ff3385;
+            text-shadow: 0 0 15px #ff0055;
+            margin-bottom: 25px;
+        }
+        
+        #modal-centro-card p {
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TELA INICIAL -->
+    <div id="intro-screen">
+        <h1>Para Lily 🌻</h1>
+        <img src="Tapinha.gif" alt="Animação">
+        <button id="btn-iniciar" class="btn-acao">INICIAR A MAGIA ✨</button>
+    </div>
+
+    <!-- CENA DA GALÁXIA -->
+    <div id="galaxy-container">
+        <div id="stars-container"></div>
+        
+        <div class="core-glow"></div>
+        
+        <!-- Botão invisível em cima do coração central -->
+        <div id="center-click-area"></div>
+        
+        <!-- Contêiner do Coração formado por pequenos corações -->
+        <div id="heart-cluster"></div>
+        
+        <div id="vortex"></div>
+    </div>
+
+    <!-- MODAL 1: CARTA DA IMAGEM -->
+    <div id="modal-lily" class="modal-overlay">
+        <div class="modal-card" id="modal-card">
+            <h2>Feliz aniversário, Lily 🌻</h2>
+            <div class="text-content">
+                <p>Hoje é o seu dia, e mesmo que eu quisesse muito poder estar perto de você para comemorar, eu queria pelo menos conseguir colocar em palavras um pouco do quanto você é importante para mim.</p>
+                <p>Ao longo do tempo, eu vi você mudar. Vi você crescer, aprender, passar por momentos que te fizeram enxergar a vida de uma forma diferente e se tornar uma pessoa ainda mais forte. A Lily de hoje talvez não seja exatamente a mesma de antes, mas isso faz parte da beleza de uma pessoa: ela continua sendo ela mesma, mas com novas experiências, novos pensamentos e uma nova forma de ver o mundo.</p>
+                <p>Uma coisa que eu admiro muito em você é a sua personalidade. Você tem um jeito único de ser, uma presença que marca, uma forma própria de pensar e de enxergar as coisas. Você não precisa tentar ser igual a ninguém, porque aquilo que faz você ser você é justamente o que torna você especial.</p>
+                <p>Eu admiro a sua força, a sua capacidade de continuar seguindo mesmo quando as coisas não são simples, a maneira como você amadureceu e como você aprendeu a se conhecer melhor. Eu sei que nem sempre é fácil lidar com tudo que aparece na vida, mas ainda assim você continua construindo sua própria história.</p>
+                <p>Também admiro os pequenos detalhes em você: seu jeito de falar, suas opiniões, suas reações, as coisas que você gosta, as coisas que fazem seus olhos brilharem. Às vezes são justamente essas pequenas coisas que fazem uma pessoa ser inesquecível.</p>
+                <p>Espero que esse novo ciclo seja cheio de momentos bons, conquistas e coisas que façam você sentir orgulho da pessoa que está se tornando. Espero que você encontre motivos para sorrir, pessoas que te façam bem e caminhos que te levem para lugares onde você queira estar.</p>
+                <p>Nunca esqueça que você tem valor. Que sua existência importa e que você merece viver coisas bonitas, alcançar seus sonhos e ser feliz do seu jeito.</p>
+                <p>Obrigado por todos os momentos que já compartilhamos, pelas conversas, pelas lembranças e por fazer parte da minha vida. Independentemente das mudanças e do tempo passando, eu fico feliz por ter conhecido você e por poder desejar que seu dia seja incrível.</p>
+                <p style="text-align: center; font-weight: bold; margin-top: 15px; font-size: clamp(15px, 4.5vw, 17px); color: #ffcc00;">
+                    Que seu aniversário seja tão especial quanto a pessoa que você é.<br>
+                    Feliz aniversário, Lily 🌻💛
+                </p>
+            </div>
+            <button class="fechar-modal btn-fechar">Guardar no Coração ❤️</button>
+        </div>
+    </div>
+
+    <!-- MODAL 2: MENSAGEM DO CORAÇÃO CENTRAL -->
+    <div id="modal-centro" class="modal-overlay">
+        <div class="modal-card" id="modal-centro-card">
+            <h2>Feliz Aniversário! 🎉🎈</h2>
+            <p>Que o seu dia seja tão brilhante, especial e cheio de amor quanto você merece! Aproveite cada segundo. 💖🌻</p>
+            <button class="fechar-modal btn-fechar-centro">Obrigado 🥰</button>
+        </div>
+    </div>
+
+    <script>
+        const introScreen = document.getElementById('intro-screen');
+        const galaxyContainer = document.getElementById('galaxy-container');
+        const starsContainer = document.getElementById('stars-container');
+        const vortex = document.getElementById('vortex');
+        const heartCluster = document.getElementById('heart-cluster');
+        
+        // Modais
+        const modalLily = document.getElementById('modal-lily');
+        const modalCard = document.getElementById('modal-card');
+        const modalCentro = document.getElementById('modal-centro');
+        const modalCentroCard = document.getElementById('modal-centro-card');
+        const centerClickArea = document.getElementById('center-click-area');
+        
+        // Verifica se é tela de celular
+        const isMobile = window.innerWidth < 768;
+
+        // Lista de Palavras E MUITOS EMOJIS!
+        const orbitWords = [
+            "LILY", "ESPECIAL", "INESQUECÍVEL", "🌻", "ORGULHO", 
+            "RESILIÊNCIA", "💛", "CONSTELAÇÃO", "ÚNICA", "✨", 
+            "LUZ", "BRILHO", "ESSÊNCIA", "ADMIRAÇÃO", "DESTINO",
+            "🥰", "🎉", "🎁", "🦋", "🌸", "🌷", "💖", "💝", "🫶", "🎈", "🌟"
+        ];
+
+        // 1. Cria estrelas de fundo
+        function createStars() {
+            const numStars = isMobile ? 80 : 150; 
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.top = Math.random() * 100 + 'vh';
+                star.style.setProperty('--duration', (Math.random() * 3 + 1) + 's');
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // 2. Desenha o coração gradualmente
+        function createHeartOfHearts() {
+            const numHearts = isMobile ? 35 : 55; 
+            const scale = isMobile ? (window.innerWidth / 35) : 10; 
+            
+            for (let i = 0; i < numHearts; i++) {
+                setTimeout(() => {
+                    const t = (i / numHearts) * Math.PI * 2;
+                    const x = 16 * Math.pow(Math.sin(t), 3);
+                    const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+
+                    const mini = document.createElement('div');
+                    mini.className = 'mini-heart';
+                    mini.innerText = '❤️';
+                    
+                    mini.style.left = `calc(50% + ${x * scale}px)`;
+                    mini.style.top = `calc(50% + ${y * scale}px)`;
+                    
+                    mini.style.animation = `popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, miniPulse 1s 0.5s infinite alternate`;
+                    
+                    heartCluster.appendChild(mini);
+                }, i * 40); 
+            }
+        }
+
+        // 3. Cria a Galáxia com ESPAÇOS MAIORES e VELOCIDADES DIFERENTES
+        function createGalaxy() {
+            // Aumenta a quantidade se quiser mais densidade de emojis
+            const numParticles = isMobile ? 30 : 45; 
+
+            for (let i = 0; i < numParticles; i++) {
+                const text = orbitWords[Math.floor(Math.random() * orbitWords.length)];
+                
+                // RAIO DE ÓRBITA AUMENTADO para espalhar as palavras
+                const minRadius = isMobile ? 120 : 180;
+                const maxRadius = isMobile ? 180 : 350;
+                
+                // Distrubuição mais equilibrada
+                const radius = minRadius + (Math.random() * maxRadius); 
+                const startingAngle = Math.random() * 360; 
+
+                const orbitItem = document.createElement('div');
+                orbitItem.className = 'orbit-item';
+                orbitItem.style.transform = `translate(-50%, -50%) rotateZ(${startingAngle}deg) translateX(${radius}px)`;
+
+                const content = document.createElement('div');
+                content.className = 'orbit-content';
+                content.innerText = text;
+                content.style.opacity = 0.4 + Math.random() * 0.6;
+
+                // VELOCIDADE ALEATÓRIA: Evita que fiquem andando em blocos fechados
+                const duration = 25 + Math.random() * 35; // Entre 25s e 60s
+                content.style.animation = `counterSpin ${duration}s linear infinite`;
+
+                orbitItem.appendChild(content);
+                vortex.appendChild(orbitItem);
+            }
+
+            // === IMAGEM FLUTUANTE ===
+            const imgRadius = isMobile ? 130 : 250; 
+            const imgAngle = 45; 
+
+            const imgOrbitContainer = document.createElement('div');
+            imgOrbitContainer.className = 'orbit-item';
+            imgOrbitContainer.style.transform = `translate(-50%, -50%) rotateZ(${imgAngle}deg) translateX(${imgRadius}px)`;
+            imgOrbitContainer.style.zIndex = "20";
+
+            const imgContent = document.createElement('img');
+            imgContent.src = 'image_5644bb.jpg'; 
+            imgContent.alt = 'Clique aqui!';
+            imgContent.className = 'orbit-image';
+            
+            // Corrige o counterSpin da imagem usando o mesmo tempo do vortex base (40s)
+            imgContent.style.animation = `counterSpin 40s linear infinite, floatSpidey 3s ease-in-out infinite alternate`;
+            
+            imgContent.onclick = () => {
+                modalLily.style.visibility = 'visible';
+                modalLily.style.opacity = '1';
+                modalCard.style.transform = 'translateY(0) scale(1)';
+            };
+
+            imgOrbitContainer.appendChild(imgContent);
+            vortex.appendChild(imgOrbitContainer);
+        }
+
+        // 4. Iniciar Animação
+        document.getElementById('btn-iniciar').addEventListener('click', () => {
+            introScreen.style.opacity = '0';
+            introScreen.style.transform = 'translateY(-30px) scale(0.9)';
+            
+            setTimeout(() => {
+                introScreen.style.display = 'none';
+                
+                galaxyContainer.style.visibility = 'visible';
+                galaxyContainer.style.opacity = '1';
+
+                createStars();
+                createGalaxy();
+                createHeartOfHearts(); 
+                
+            }, 800);
+        });
+
+        // 5. Clique no coração central
+        centerClickArea.addEventListener('click', () => {
+            modalCentro.style.visibility = 'visible';
+            modalCentro.style.opacity = '1';
+            modalCentroCard.style.transform = 'translateY(0) scale(1)';
+        });
+
+        // 6. Fechar Modais
+        document.querySelector('.btn-fechar').addEventListener('click', () => {
+            modalLily.style.opacity = '0';
+            modalCard.style.transform = 'translateY(30px) scale(0.95)';
+            setTimeout(() => { modalLily.style.visibility = 'hidden'; }, 500);
+        });
+
+        document.querySelector('.btn-fechar-centro').addEventListener('click', () => {
+            modalCentro.style.opacity = '0';
+            modalCentroCard.style.transform = 'translateY(30px) scale(0.95)';
+            setTimeout(() => { modalCentro.style.visibility = 'hidden'; }, 500);
+        });
+    </script>
+</body>
+</html>
